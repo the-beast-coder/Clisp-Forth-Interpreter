@@ -1,3 +1,5 @@
+(declaim (optimize speed (safety 0)))
+
 (defvar *stack* (list))
 (defvar *compile-mode* nil)
 (defvar *in-string* nil)
@@ -60,7 +62,7 @@
 				  (eval-token (string-upcase token))))
 		  (string-mode-eval token))
 	  (if (string= token ";")
-		  (end-compile)	
+		  (end-compile)
 		  (setf *compile-buffer* (append *compile-buffer* (list token))))))
 
 (defun eval-line (line)
@@ -76,15 +78,30 @@
 					(list '* 'mul-stack)
 					(list 'drop 'pop-stack)
 					(list '\. 'print-and-pop-stack)
+					(list 'to-string 'stack-to-string)
 					(list 'page 'clear-screen)
 					(list 'page 'clear-screen)
 					(list '\: 'start-compile)
 					(list 'concat 'concat-stack)
 					(list 'swap 'swap-stack)
+					(list 'sh 'shell-stack)
+					(list 'shell 'shell-stack)
 					(list '2swap 'two-swap-stack)					  
 					(list 'rot 'rot-stack)
 					(list 'dup 'dup-stack)
+;;					(list '= 'equals-stack)
+;;					(list '>= 'greater-equals-stack)
+;;					(list '<= 'greater-equals-stack)
+;;					(list '> 'greater-stack)
+;;					(list '< less-stack)
+;;					(list 'not 'not-stack)
 					(list 'bye 'exit)))
 
-(loop
-  (eval-line (read-line)))
+(if (> (length *args*) 0)
+	(let ((in (open (car *args*) :if-does-not-exist nil)))
+	  (when in
+		(loop for line = (read-line in nil)
+			  while line do (eval-line line))
+		(close in)))
+	(loop
+	   (eval-line (read-line))))

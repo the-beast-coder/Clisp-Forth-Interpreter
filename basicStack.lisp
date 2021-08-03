@@ -58,6 +58,10 @@
 (defun dup-stack ()
   (setf *stack* (append *stack* (list (car (last *stack*))))))
 
+(defun stack-to-string ()
+	(setf (nth (- (length *stack*) 1) *stack*) (write-to-string (first (last *stack*)))))
+
+
 ;; If the stack starts out as abc the stack should output as bca
 (defun rot-stack ()
   (let ((top (first (last *stack*))) (second-top (first (last (butlast *stack*)))))
@@ -81,3 +85,6 @@
 ;;  (screen:with-window (screen:clear-window screen:*window*))
 ;;  (screen:clear-window (screen:make-window))
   (format t "clearing....~%"))
+
+(defun shell-stack ()
+  (run-shell-command (pop-stack)))
